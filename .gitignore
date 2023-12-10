@@ -1,0 +1,41 @@
+
+# General
+*.log
+*.tmp
+.DS_Store
+
+# Go specific
+bin/
+pkg/
+*.o
+*.a
+*.so
+*.exe
+!example/**/*.exe
+!test/**/*.exe
+*.test
+*.out
+vendor/
+*.mod
+*.sum
+
+# Rust specific
+/target/
+**/*.rs.bk
+Cargo.lock
+**/Cargo.lock
+
+# Editor specific (e.g., Visual Studio Code)
+.vscode/
+
+# Operating system specific
+*.swp
+*~
+Thumbs.db
+
+# Environment specific
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
