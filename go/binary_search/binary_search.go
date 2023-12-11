@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
 func binarySearch(haystack []int, needle int) bool {
@@ -11,7 +10,7 @@ func binarySearch(haystack []int, needle int) bool {
 
 	done := lo < hi
 	for done {
-		m := int(math.Floor(float64(lo + (hi-lo)/2)))
+		m := int(float64(lo + (hi-lo)/2))
 		v := haystack[m]
 
 		if v == needle {
