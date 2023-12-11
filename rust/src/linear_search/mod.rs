@@ -1,5 +1,3 @@
-
-// rewrite linear_search to be generic
 fn linear_search<T: PartialEq>(haystack: &[T], needle: &T) -> bool {
     for item in haystack {
         if item == needle {
