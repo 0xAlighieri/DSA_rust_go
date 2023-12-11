@@ -1,4 +1,3 @@
-
 fn linear_search(haystack: &[i32], needle: i32) -> bool {
     for &item in haystack {
         if item == needle {
