@@ -9,7 +9,7 @@ fn binary_search(haystack: &[i32], needle: i32) -> bool {
         match current.cmp(&needle) {
             std::cmp::Ordering::Equal => return true,
             std::cmp::Ordering::Less => lo = m + 1,
-            std::cmp::Ordering::Greater => hi = m - 1,
+            std::cmp::Ordering::Greater => hi = m,
         }
         m = (hi + lo) / 2;
         current = haystack[m];
