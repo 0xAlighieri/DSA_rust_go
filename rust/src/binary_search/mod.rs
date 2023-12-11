@@ -14,7 +14,7 @@ fn binary_search(haystack: &[i32], needle: i32) -> bool {
         m = (hi + lo) / 2;
         current = haystack[m];
     }
-    return false;
+    false
 }
 
 fn main() {
