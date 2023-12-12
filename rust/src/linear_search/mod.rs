@@ -24,7 +24,6 @@ mod tests {
         assert_eq!(linear_search(&haystack, &needle), true);
     }
 
-
     #[test]
     fn test_linear_search_not_present() {
         let haystack = vec![1, 2, 3, 4, 5];
