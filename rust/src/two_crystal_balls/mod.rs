@@ -7,7 +7,7 @@ fn two_crystal_balls(breaks: &[bool]) -> i32 {
         if breaks[i] {
             break;
         }
-        i += jump_amount as usize;
+        i += jump_amount;
     }
     i -= jump_amount;
 
