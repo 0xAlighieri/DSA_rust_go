@@ -1,4 +1,4 @@
-package main
+package two_crystal_balls
 
 import (
 	"testing"

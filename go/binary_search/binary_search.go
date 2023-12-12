@@ -1,4 +1,4 @@
-package main
+package binary_search
 
 import (
 	"fmt"
