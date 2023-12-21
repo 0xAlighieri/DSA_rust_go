@@ -72,8 +72,6 @@ pub fn maze_solver(maze: &[String], wall: &str, start: Point, end: Point) -> Vec
     return path;
 }
 
-// Assuming the `Point` struct and `maze_solver` function are defined as per your requirement
-
 #[cfg(test)]
 mod tests {
     use super::*;
