@@ -6,9 +6,6 @@ import (
 
 func TestDoublyLinkedList(t *testing.T) {
 	list := NewDoublyLinkedList[int]()
-	equalsInt := func(a, b int) bool {
-		return a == b
-	}
 
 	list.Append(5)
 	list.Append(7)
@@ -28,7 +25,7 @@ func TestDoublyLinkedList(t *testing.T) {
 	if val := list.RemoveAt(1); *val != 9 {
 		t.Errorf("Expected 9, got %d", *val)
 	}
-	if val := list.Remove(9, equalsInt); val != nil {
+	if val := list.Remove(9); val != nil {
 		t.Errorf("Expected nil, got %d", *val)
 	}
 	if val := list.RemoveAt(0); *val != 5 {
@@ -51,7 +48,7 @@ func TestDoublyLinkedList(t *testing.T) {
 	if val := list.Get(0); val != 9 {
 		t.Errorf("Expected 9, got %d", val)
 	}
-	val := list.Remove(9, equalsInt)
+	val := list.Remove(9)
 	if val == nil || *val != 9 {
 		if val == nil {
 			t.Errorf("Expected 9, got nil")

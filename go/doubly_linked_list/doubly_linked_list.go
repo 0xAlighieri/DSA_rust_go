@@ -1,20 +1,18 @@
 package doubly_linked_list
 
-type EqualsFunc[T any] func(a, b T) bool
-
-type Node[T any] struct {
+type Node[T comparable] struct {
 	value T
 	prev  *Node[T]
 	next  *Node[T]
 }
 
-type DoublyLinkedList[T any] struct {
+type DoublyLinkedList[T comparable] struct {
 	head   *Node[T]
 	tail   *Node[T]
 	length int
 }
 
-func NewDoublyLinkedList[T any]() *DoublyLinkedList[T] {
+func NewDoublyLinkedList[T comparable]() *DoublyLinkedList[T] {
 	return &DoublyLinkedList[T]{}
 }
 
@@ -76,30 +74,19 @@ func (l *DoublyLinkedList[T]) Append(item T) {
 }
 
 // remove
-// func (l *DoublyLinkedList[T]) Remove(item T) *T {
-// 	curr := l.head
-// 	for i := 0; curr != nil && i < l.length; i++ {
-// 		// print the value of the current node
-// 		if &curr.value == &item {
-// 			break
-// 		}
-// 		curr = curr.next
-// 	}
-// 	if curr == nil {
-// 		return nil
-// 	}
-// 	return l.removeNode(curr)
-// }
-
-func (l *DoublyLinkedList[T]) Remove(item T, equals EqualsFunc[T]) *T {
+func (l *DoublyLinkedList[T]) Remove(item T) *T {
 	curr := l.head
-	for curr != nil {
-		if equals(curr.value, item) {
-			return l.removeNode(curr)
+	for i := 0; curr != nil && i < l.length; i++ {
+		// print the value of the current node
+		if curr.value == item {
+			break
 		}
 		curr = curr.next
 	}
-	return nil
+	if curr == nil {
+		return nil
+	}
+	return l.removeNode(curr)
 }
 
 // get
