@@ -1,5 +1,6 @@
 mod binary_search;
 mod bubble_sort;
+mod doubly_linked_list;
 mod linear_search;
 mod maze_solver;
 mod queue;
