@@ -77,7 +77,6 @@ func (l *DoublyLinkedList[T]) Append(item T) {
 func (l *DoublyLinkedList[T]) Remove(item T) *T {
 	curr := l.head
 	for i := 0; curr != nil && i < l.length; i++ {
-		// print the value of the current node
 		if curr.value == item {
 			break
 		}
