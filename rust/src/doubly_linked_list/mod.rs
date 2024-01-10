@@ -51,8 +51,6 @@ impl<T: Copy + PartialEq> DoublyLinkedList<T> {
         }
     }
 
-    // pub fn insert_at(&mut self, value: T, index: usize) {}
-    //
     pub fn append(&mut self, value: T) {
         let node = Node::new(value);
         self.len += 1;
@@ -158,13 +156,6 @@ impl<T: Copy + PartialEq> DoublyLinkedList<T> {
         self.len -= 1;
         Rc::try_unwrap(node).ok().unwrap().into_inner().value
     }
-
-    // pub fn remove(&mut self, value: T) -> T {}
-    //
-    // // a lot of ugly cloning going on here...
-    // fn remove_node(&mut self, node: Rc<RefCell<Node<T>>>) -> T {}
-    //
-    // fn get_at(&self, index: usize) -> Option<Rc<RefCell<Node<T>>>> {}
 }
 
 #[cfg(test)]
@@ -462,6 +453,4 @@ mod tests {
         assert_eq!(list.get(0), Some(1));
         assert_eq!(list.get(1), None);
     }
-
-    // Additional tests can be written to cover more scenarios
 }
