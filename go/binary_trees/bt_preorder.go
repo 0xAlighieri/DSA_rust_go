@@ -1,5 +1,6 @@
 package binary_trees
 
+// fdsaf
 type BTNode[T comparable] struct {
 	value T
 	left  *BTNode[T]
