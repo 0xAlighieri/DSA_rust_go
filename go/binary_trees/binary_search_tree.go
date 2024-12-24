@@ -79,3 +79,28 @@ func (n *Node[T]) PostOrderTraversal() []T {
 
 	return result
 }
+
+func (n *Node[T]) BFSearch(needle T) bool {
+	if n == nil {
+		return false
+	}
+	queue := []*Node[T]{n}
+
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:]
+
+		if current.value == needle {
+			return true
+		}
+
+		if current.left != nil {
+			queue = append(queue, current.left)
+		}
+
+		if current.right != nil {
+			queue = append(queue, current.right)
+		}
+	}
+	return false
+}

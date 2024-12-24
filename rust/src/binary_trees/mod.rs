@@ -1,4 +1,6 @@
-pub enum BST<T: Ord + std::fmt::Debug + Clone> {
+use crate::queue::Queue;
+
+pub enum BST<T: Ord + std::fmt::Debug + Clone + Copy> {
     Leaf {
         value: T,
         left: Box<BST<T>>,
@@ -7,7 +9,7 @@ pub enum BST<T: Ord + std::fmt::Debug + Clone> {
     Empty,
 }
 
-impl<T: Ord + std::fmt::Debug + Clone> BST<T> {
+impl<T: Ord + std::fmt::Debug + Clone + Copy> BST<T> {
     pub fn insert(&mut self, new_value: T) {
         match self {
             BST::Empty => {
@@ -107,6 +109,57 @@ impl<T: Ord + std::fmt::Debug + Clone> BST<T> {
             println!("{:?}", value);
         }
     }
+
+    pub fn bf_search(&self, needle: T) -> bool {
+        match self {
+            BST::Empty => false,
+            BST::Leaf {
+                ref value,
+                ref left,
+                ref right,
+            } => {
+                let mut q = Queue::new();
+                q.enqueue(*value);
+
+                let mut nodes_to_check = vec![(left, right)];
+
+                while q.len() > 0 {
+                    if let Some(curr) = q.deque() {
+                        if curr == needle {
+                            return true; // Actually return when we find the value
+                        }
+
+                        if let Some((left_child, right_child)) = nodes_to_check.pop() {
+                            match left_child.as_ref() {
+                                BST::Leaf {
+                                    value: v,
+                                    left: l,
+                                    right: r,
+                                } => {
+                                    q.enqueue(*v);
+                                    nodes_to_check.push((l, r));
+                                }
+                                BST::Empty => {}
+                            }
+
+                            match right_child.as_ref() {
+                                BST::Leaf {
+                                    value: v,
+                                    left: l,
+                                    right: r,
+                                } => {
+                                    q.enqueue(*v);
+                                    nodes_to_check.push((l, r));
+                                }
+                                BST::Empty => {}
+                            }
+                        }
+                    }
+                }
+                false
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -151,6 +204,101 @@ mod tests {
             tree.postorder_traversal(),
             vec![3, 5, 3, 7, 7, 5],
             "Postorder should show leaves first, then their parents"
+        );
+    }
+
+    #[test]
+    fn test_bf_search_empty_tree() {
+        // First, let's test the simplest case - an empty tree
+        let empty_tree: BST<i32> = BST::Empty;
+        assert!(
+            !empty_tree.bf_search(5),
+            "Searching in an empty tree should always return false"
+        );
+    }
+
+    #[test]
+    fn test_bf_search_single_node() {
+        // Next, test a tree with just one node
+        let mut single_node = BST::Empty;
+        single_node.insert(5);
+
+        assert!(
+            single_node.bf_search(5),
+            "Should find the value in a single-node tree"
+        );
+        assert!(
+            !single_node.bf_search(3),
+            "Should not find a non-existent value in single-node tree"
+        );
+    }
+
+    #[test]
+    fn test_bf_search_complete_tree() {
+        // Create a more complete tree structure:
+        //       5
+        //      / \
+        //     3   7
+        //    /     \
+        //   1       9
+        let mut tree = BST::Empty;
+        tree.insert(5); // Root
+        tree.insert(3); // Left child
+        tree.insert(7); // Right child
+        tree.insert(1); // Left-left child
+        tree.insert(9); // Right-right child
+
+        // Test finding values at different levels of the tree
+        assert!(tree.bf_search(5), "Should find root value");
+        assert!(tree.bf_search(3), "Should find value in left subtree");
+        assert!(tree.bf_search(7), "Should find value in right subtree");
+        assert!(tree.bf_search(1), "Should find value in deep left position");
+        assert!(
+            tree.bf_search(9),
+            "Should find value in deep right position"
+        );
+
+        // Test searching for non-existent values
+        assert!(
+            !tree.bf_search(4),
+            "Should not find value between existing nodes"
+        );
+        assert!(
+            !tree.bf_search(0),
+            "Should not find value less than minimum"
+        );
+        assert!(
+            !tree.bf_search(10),
+            "Should not find value greater than maximum"
+        );
+    }
+
+    #[test]
+    fn test_bf_search_with_duplicates() {
+        // Create a tree with duplicate values:
+        //       5
+        //      / \
+        //     3   5
+        //    /     \
+        //   3       5
+        let mut tree = BST::Empty;
+        tree.insert(5);
+        tree.insert(3);
+        tree.insert(5); // Duplicate of root
+        tree.insert(3); // Duplicate of left child
+        tree.insert(5); // Another duplicate
+
+        assert!(
+            tree.bf_search(5),
+            "Should find value that appears multiple times"
+        );
+        assert!(
+            tree.bf_search(3),
+            "Should find duplicate value in left subtree"
+        );
+        assert!(
+            !tree.bf_search(7),
+            "Should not find non-existent value in tree with duplicates"
         );
     }
 }

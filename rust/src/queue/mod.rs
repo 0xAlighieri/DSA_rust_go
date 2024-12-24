@@ -15,7 +15,7 @@ impl<T> Node<T> {
 }
 
 #[derive(Clone)]
-struct Queue<T> {
+pub struct Queue<T> {
     head: QueueItem<T>,
     tail: QueueItem<T>,
     len: usize,
@@ -50,11 +50,10 @@ impl<T: Copy> Queue<T> {
                 self.tail.take();
             }
             self.len -= 1;
-            Rc::try_unwrap(head)
-                .ok()
-                .expect("Something went wrong")
-                .into_inner()
-                .value
+            match Rc::try_unwrap(head) {
+                Ok(cell) => cell.into_inner().value,
+                Err(_) => panic!("Unexpected multiple references to head node"),
+            }
         })
     }
 
