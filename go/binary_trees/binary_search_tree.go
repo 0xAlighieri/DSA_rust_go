@@ -104,3 +104,19 @@ func (n *Node[T]) BFSearch(needle T) bool {
 	}
 	return false
 }
+
+func (n *Node[T]) Compare(other *Node[T]) bool {
+	if n == nil && other == nil {
+		return true
+	}
+
+	if n == nil || other == nil {
+		return false
+	}
+
+	if n.value != other.value {
+		return false
+	}
+
+	return n.left.Compare(other.left) && n.right.Compare(other.right)
+}

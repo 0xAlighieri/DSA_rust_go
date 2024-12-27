@@ -29,6 +29,35 @@ impl<T: Ord + std::fmt::Debug + Clone + Copy> BST<T> {
         }
     }
 
+    pub fn compare(&self, other: &BST<T>) -> bool
+    where
+        T: Ord + PartialEq,
+    {
+        match (self, other) {
+            (BST::Empty, BST::Empty) => true,
+            (
+                BST::Leaf {
+                    value: v1,
+                    left: l1,
+                    right: r1,
+                },
+                BST::Leaf {
+                    value: v2,
+                    left: l2,
+                    right: r2,
+                },
+            ) => {
+                // First check values to short-circuit if they're different
+                if v1 != v2 {
+                    return false;
+                }
+                // Then recursively check subtrees
+                l1.compare(l2) && r1.compare(r2)
+            }
+            _ => false,
+        }
+    }
+
     pub fn inorder_traversal(&self) -> Vec<T> {
         let mut result = Vec::new();
         self.inorder_collect(&mut result);
@@ -300,5 +329,144 @@ mod tests {
             !tree.bf_search(7),
             "Should not find non-existent value in tree with duplicates"
         );
+    }
+
+    // Helper function to create test trees more easily
+    fn create_test_tree(values: &[i32]) -> BST<i32> {
+        let mut tree = BST::Empty;
+        for &value in values {
+            if let BST::Empty = tree {
+                tree = BST::Leaf {
+                    value,
+                    left: Box::new(BST::Empty),
+                    right: Box::new(BST::Empty),
+                };
+            } else {
+                tree.insert(value);
+            }
+        }
+        tree
+    }
+
+    #[test]
+    fn test_compare_empty_trees() {
+        // Two empty trees should be considered equal
+        let tree1: BST<i32> = BST::Empty;
+        let tree2: BST<i32> = BST::Empty;
+        assert!(tree1.compare(&tree2), "Empty trees should be equal");
+    }
+
+    #[test]
+    fn test_compare_empty_vs_nonempty() {
+        // An empty tree should not equal a non-empty tree
+        let tree1: BST<i32> = BST::Empty;
+        let tree2 = create_test_tree(&[5]);
+        assert!(
+            !tree1.compare(&tree2),
+            "Empty tree should not equal non-empty tree"
+        );
+        assert!(
+            !tree2.compare(&tree1),
+            "Non-empty tree should not equal empty tree"
+        );
+    }
+
+    #[test]
+    fn test_compare_single_node() {
+        // Test trees with just one node
+        let tree1 = create_test_tree(&[5]);
+        let tree2 = create_test_tree(&[5]);
+        let tree3 = create_test_tree(&[7]);
+
+        assert!(
+            tree1.compare(&tree2),
+            "Identical single-node trees should be equal"
+        );
+        assert!(
+            !tree1.compare(&tree3),
+            "Different single-node trees should not be equal"
+        );
+    }
+
+    #[test]
+    fn test_compare_complex_identical_trees() {
+        // Test more complex trees with multiple levels
+        // Creates a tree structure:
+        //       5
+        //      / \
+        //     3   7
+        //    /     \
+        //   1       9
+        let tree1 = create_test_tree(&[5, 3, 7, 1, 9]);
+        let tree2 = create_test_tree(&[5, 3, 7, 1, 9]);
+
+        assert!(
+            tree1.compare(&tree2),
+            "Identical complex trees should be equal"
+        );
+    }
+
+    #[test]
+    fn test_compare_different_structures() {
+        // Test trees with different structures
+        // First tree:         Second tree:
+        //     5                    5
+        //    /                    /
+        //   3                    4
+        //    \                  /
+        //     4                3
+        let tree1 = create_test_tree(&[5, 3, 4]);
+        let tree2 = create_test_tree(&[5, 4, 3]);
+
+        assert!(
+            !tree1.compare(&tree2),
+            "Trees with different structures should not be equal"
+        );
+    }
+
+    #[test]
+    fn test_compare_with_duplicates() {
+        // Test how comparison handles duplicate values
+        let tree1 = create_test_tree(&[5, 3, 7, 3, 5]);
+        let tree2 = create_test_tree(&[5, 3, 7, 3, 5]);
+        let tree3 = create_test_tree(&[5, 3, 7, 3, 7]); // Different duplicate
+
+        assert!(
+            tree1.compare(&tree2),
+            "Trees with identical structure and duplicates should be equal"
+        );
+        assert!(
+            !tree1.compare(&tree3),
+            "Trees with different duplicate values should not be equal"
+        );
+    }
+
+    #[test]
+    fn test_compare_different_depths() {
+        // Test trees of different depths
+        // Tree1:     Tree2:
+        //   5          5
+        //  / \        /
+        // 3   7      3
+        let tree1 = create_test_tree(&[5, 3, 7]);
+        let tree2 = create_test_tree(&[5, 3]);
+
+        assert!(
+            !tree1.compare(&tree2),
+            "Trees with different depths should not be equal"
+        );
+    }
+
+    #[test]
+    fn test_compare_ownership() {
+        // Test that comparison doesn't consume the trees
+        let tree1 = create_test_tree(&[5, 3, 7]);
+        let tree2 = create_test_tree(&[5, 3, 7]);
+
+        // First comparison
+        assert!(tree1.compare(&tree2));
+
+        // We should be able to use the trees again
+        assert!(tree1.compare(&tree2));
     }
 }

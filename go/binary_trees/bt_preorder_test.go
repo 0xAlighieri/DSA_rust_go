@@ -130,3 +130,120 @@ func TestBFSearch(t *testing.T) {
 		}
 	})
 }
+
+func TestCompareInt(t *testing.T) {
+	// Helper function to create test trees more easily
+	// Takes a variable number of integers and returns a BST containing those values
+	createTree := func(values ...int) *Node[int] {
+		if len(values) == 0 {
+			return nil
+		}
+		root := NewBST(values[0])
+		for _, v := range values[1:] {
+			root.Insert(v)
+		}
+		return root
+	}
+
+	// Test 1: Empty trees should be considered equal
+	// This tests the base case of our recursive comparison
+	t.Run("Empty trees", func(t *testing.T) {
+		var tree1, tree2 *Node[int]
+		if !tree1.Compare(tree2) {
+			t.Error("Empty trees should be equal")
+		}
+	})
+
+	// Test 2: An empty tree should not be equal to a non-empty tree
+	// This verifies that we correctly handle cases where trees have different structures
+	t.Run("Empty vs non-empty", func(t *testing.T) {
+		var tree1 *Node[int]
+		tree2 := createTree(5)
+		if tree1.Compare(tree2) {
+			t.Error("Empty tree should not equal non-empty tree")
+		}
+	})
+
+	// Test 3: Two trees with the same single value should be equal
+	// This tests the simplest non-empty case
+	t.Run("Single node identical", func(t *testing.T) {
+		tree1 := createTree(5)
+		tree2 := createTree(5)
+		if !tree1.Compare(tree2) {
+			t.Error("Identical single-node trees should be equal")
+		}
+	})
+
+	// Test 4: Two trees with different single values should not be equal
+	// This verifies that we actually compare values, not just structure
+	t.Run("Single node different", func(t *testing.T) {
+		tree1 := createTree(5)
+		tree2 := createTree(7)
+		if tree1.Compare(tree2) {
+			t.Error("Different single-node trees should not be equal")
+		}
+	})
+
+	// Test 5: Complex identical trees should be equal
+	// This tests our recursive comparison with a more complex tree structure
+	t.Run("Complex identical trees", func(t *testing.T) {
+		// Creating two identical trees with structure:
+		//       5
+		//      / \
+		//     3   7
+		//    /     \
+		//   1       9
+		tree1 := createTree(5, 3, 7, 1, 9)
+		tree2 := createTree(5, 3, 7, 1, 9)
+		if !tree1.Compare(tree2) {
+			t.Error("Identical complex trees should be equal")
+		}
+	})
+
+	t.Run("Different structures", func(t *testing.T) {
+		// First tree:
+		//     5
+		//    /
+		//   3
+		//    \
+		//     4
+		tree1 := createTree(5, 3, 4)
+
+		// Second tree:
+		//     5
+		//    /
+		//   4
+		//  /
+		// 3
+		tree2 := createTree(5, 4, 3)
+
+		if tree1.Compare(tree2) {
+			t.Error("Trees with different structures should not be equal")
+		}
+	})
+
+	// Test 7: Trees with different depths should not be equal
+	// This tests that we properly handle trees of different sizes
+	t.Run("Different depths", func(t *testing.T) {
+		// Tree1:     Tree2:
+		//   5          5
+		//  / \        /
+		// 3   7      3
+		tree1 := createTree(5, 3, 7)
+		tree2 := createTree(5, 3)
+		if tree1.Compare(tree2) {
+			t.Error("Trees with different depths should not be equal")
+		}
+	})
+
+	// Test 8: Trees with multiple levels and duplicate values
+	// This ensures our comparison works with duplicate values
+	t.Run("Trees with duplicates", func(t *testing.T) {
+		// Create two identical trees with duplicates
+		tree1 := createTree(5, 3, 7, 3, 5)
+		tree2 := createTree(5, 3, 7, 3, 5)
+		if !tree1.Compare(tree2) {
+			t.Error("Trees with identical structure and duplicate values should be equal")
+		}
+	})
+}
