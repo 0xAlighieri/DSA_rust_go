@@ -105,6 +105,19 @@ func (n *Node[T]) BFSearch(needle T) bool {
 	return false
 }
 
+func (n *Node[T]) DFSearch(needle T) bool {
+	if n == nil {
+		return false
+	}
+	if n.value == needle {
+		return true
+	}
+	if n.value < needle {
+		return n.right.DFSearch(needle)
+	}
+	return n.left.DFSearch(needle)
+}
+
 func (n *Node[T]) Compare(other *Node[T]) bool {
 	if n == nil && other == nil {
 		return true

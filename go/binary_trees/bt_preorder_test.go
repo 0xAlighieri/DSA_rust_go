@@ -247,3 +247,96 @@ func TestCompareInt(t *testing.T) {
 		}
 	})
 }
+
+func TestDFSearch(t *testing.T) {
+	// Helper function to create test trees
+	createTree := func(values ...int) *Node[int] {
+		if len(values) == 0 {
+			return nil
+		}
+		root := NewBST(values[0])
+		for _, v := range values[1:] {
+			root.Insert(v)
+		}
+		return root
+	}
+
+	// Test empty tree
+	t.Run("Empty tree", func(t *testing.T) {
+		var tree *Node[int]
+		if tree.DFSearch(5) {
+			t.Error("Expected false for empty tree")
+		}
+	})
+
+	// Test single node tree
+	t.Run("Single node tree", func(t *testing.T) {
+		tree := createTree(5)
+		if !tree.DFSearch(5) {
+			t.Error("Should find value in single node tree")
+		}
+		if tree.DFSearch(6) {
+			t.Error("Should not find non-existent value")
+		}
+	})
+
+	// Test more complex tree
+	t.Run("Complex tree", func(t *testing.T) {
+		// Create a tree like:
+		//       8
+		//      / \
+		//     3   10
+		//    / \    \
+		//   1   6    14
+		//      /      \
+		//     4       16
+		tree := createTree(8, 3, 10, 1, 6, 14, 4, 16)
+
+		// Test finding existing values at different levels
+		testCases := []struct {
+			search  int
+			should  bool
+			message string
+		}{
+			{8, true, "Should find root value"},
+			{3, true, "Should find value in left subtree"},
+			{10, true, "Should find value in right subtree"},
+			{1, true, "Should find leaf value in left subtree"},
+			{16, true, "Should find leaf value in right subtree"},
+			{4, true, "Should find deeply nested value"},
+			{7, false, "Should not find non-existent value between existing values"},
+			{0, false, "Should not find value less than minimum"},
+			{20, false, "Should not find value greater than maximum"},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.message, func(t *testing.T) {
+				result := tree.DFSearch(tc.search)
+				if result != tc.should {
+					t.Errorf("DFSearch(%d) = %v; want %v",
+						tc.search, result, tc.should)
+				}
+			})
+		}
+	})
+
+	// Test searching in unbalanced tree
+	t.Run("Unbalanced tree", func(t *testing.T) {
+		// Create an unbalanced tree:
+		//     1
+		//      \
+		//       2
+		//        \
+		//         3
+		//          \
+		//           4
+		tree := createTree(1, 2, 3, 4)
+
+		if !tree.DFSearch(4) {
+			t.Error("Should find value in unbalanced tree")
+		}
+		if tree.DFSearch(5) {
+			t.Error("Should not find non-existent value in unbalanced tree")
+		}
+	})
+}

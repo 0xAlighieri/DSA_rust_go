@@ -139,6 +139,26 @@ impl<T: Ord + std::fmt::Debug + Clone + Copy> BST<T> {
         }
     }
 
+    pub fn df_search(&self, needle: T) -> bool {
+        match self {
+            BST::Empty => false,
+            BST::Leaf {
+                ref value,
+                ref left,
+                ref right,
+            } => {
+                if *value == needle {
+                    return true;
+                }
+                if *value < needle {
+                    return right.df_search(needle);
+                } else {
+                    return left.df_search(needle);
+                }
+            }
+        }
+    }
+
     pub fn bf_search(&self, needle: T) -> bool {
         match self {
             BST::Empty => false,
@@ -468,5 +488,109 @@ mod tests {
 
         // We should be able to use the trees again
         assert!(tree1.compare(&tree2));
+    }
+
+    #[test]
+    fn test_df_search_empty_tree() {
+        let tree: BST<i32> = BST::Empty;
+        assert!(!tree.df_search(5), "Empty tree should return false");
+    }
+
+    #[test]
+    fn test_df_search_single_node() {
+        let tree = create_test_tree(&[5]);
+        assert!(tree.df_search(5), "Should find value in single node tree");
+        assert!(!tree.df_search(6), "Should not find non-existent value");
+    }
+
+    #[test]
+    fn test_df_search_basic_tree() {
+        // Create a basic tree:
+        //      5
+        //     / \
+        //    3   7
+        let tree = create_test_tree(&[5, 3, 7]);
+
+        assert!(tree.df_search(5), "Should find root value");
+        assert!(tree.df_search(3), "Should find left child");
+        assert!(tree.df_search(7), "Should find right child");
+        assert!(!tree.df_search(4), "Should not find non-existent value");
+    }
+
+    #[test]
+    fn test_df_search_complex_tree() {
+        // Create a more complex tree:
+        //       8
+        //      / \
+        //     3   10
+        //    / \    \
+        //   1   6    14
+        //      /      \
+        //     4       16
+        let tree = create_test_tree(&[8, 3, 10, 1, 6, 14, 4, 16]);
+
+        // Test finding values at different levels
+        assert!(tree.df_search(8), "Should find root");
+        assert!(tree.df_search(3), "Should find inner node in left subtree");
+        assert!(
+            tree.df_search(14),
+            "Should find inner node in right subtree"
+        );
+        assert!(tree.df_search(1), "Should find leaf in left subtree");
+        assert!(tree.df_search(16), "Should find leaf in right subtree");
+        assert!(tree.df_search(4), "Should find deeply nested value");
+
+        // Test not finding non-existent values
+        assert!(
+            !tree.df_search(7),
+            "Should not find value between existing nodes"
+        );
+        assert!(
+            !tree.df_search(0),
+            "Should not find value less than minimum"
+        );
+        assert!(
+            !tree.df_search(20),
+            "Should not find value greater than maximum"
+        );
+    }
+
+    #[test]
+    fn test_df_search_unbalanced_tree() {
+        // Create an unbalanced tree that leans right:
+        //   1
+        //    \
+        //     2
+        //      \
+        //       3
+        //        \
+        //         4
+        let tree = create_test_tree(&[1, 2, 3, 4]);
+
+        assert!(tree.df_search(1), "Should find root in unbalanced tree");
+        assert!(
+            tree.df_search(4),
+            "Should find deepest node in unbalanced tree"
+        );
+        assert!(
+            !tree.df_search(5),
+            "Should not find non-existent value in unbalanced tree"
+        );
+    }
+
+    #[test]
+    fn test_df_search_with_duplicates() {
+        // Create a tree with duplicate values
+        let tree = create_test_tree(&[5, 3, 7, 3]);
+
+        assert!(
+            tree.df_search(3),
+            "Should find value that appears multiple times"
+        );
+        assert!(tree.df_search(7), "Should find unique value");
+        assert!(
+            !tree.df_search(6),
+            "Should not find non-existent value when duplicates exist"
+        );
     }
 }
